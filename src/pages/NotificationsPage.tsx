@@ -1,4 +1,4 @@
-mport { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Bell, CheckCircle, XCircle, Clock, Trash2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
