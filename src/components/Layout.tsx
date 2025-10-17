@@ -32,6 +32,9 @@ export function Layout({ children, currentPage = 'home', onNavigate }: LayoutPro
       { id: 'dashboard', label: 'Tableau de bord' },
       { id: 'my-listings', label: 'Mes annonces' }
     ] : []),
+    ...(user && profile?.is_admin ? [
+      { id: 'admin', label: '⚙️ Admin', adminOnly: true }
+    ] : []),
     { id: 'contact', label: 'Contact' },
   ];
 
