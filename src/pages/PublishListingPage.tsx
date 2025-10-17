@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Upload, X, AlertCircle, CheckCircle } from 'lucide-react';
+import { Upload, X, AlertCircle, CheckCircle, Image as ImageIcon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase, Category, EquipmentType } from '../lib/supabase';
+import { uploadListingImage } from '../lib/storage';
 
 type PublishListingPageProps = {
   onNavigate: (page: string) => void;
@@ -54,10 +55,13 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
     brand: '',
     model: '',
     condition: 'used' as 'new' | 'good' | 'used',
+    sellerPhone: '',
+    sellerEmail: '',
   });
 
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [imageInput, setImageInput] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const needsAuth = selectedPlan === 'pro' || selectedPlan === 'premium';
 
@@ -127,6 +131,42 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
     }
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadingImage(true);
+    setError('');
+
+    try {
+      for (let i = 0; i < files.length && imageUrls.length + i < 6; i++) {
+        const file = files[i];
+
+        if (file.size > 5 * 1024 * 1024) {
+          setError(`Le fichier ${file.name} est trop volumineux (max 5MB)`);
+          continue;
+        }
+
+        if (!file.type.startsWith('image/')) {
+          setError(`Le fichier ${file.name} n'est pas une image`);
+          continue;
+        }
+
+        const url = await uploadListingImage(file);
+        if (url) {
+          setImageUrls(prev => [...prev, url]);
+        } else {
+          setError(`Erreur lors de l'upload de ${file.name}`);
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || 'Erreur lors de l\'upload des images');
+    } finally {
+      setUploadingImage(false);
+      e.target.value = '';
+    }
+  };
+
   const removeImage = (index: number) => {
     setImageUrls(imageUrls.filter((_, i) => i !== index));
   };
@@ -134,8 +174,8 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.categoryId || (!formData.equipmentTypeId && !formData.customEquipmentType) || !formData.title || !formData.description || !formData.price || !formData.region || !formData.city) {
-      setError('Veuillez remplir tous les champs obligatoires');
+    if (!formData.categoryId || (!formData.equipmentTypeId && !formData.customEquipmentType) || !formData.title || !formData.description || !formData.price || !formData.region || !formData.city || !formData.sellerPhone) {
+      setError('Veuillez remplir tous les champs obligatoires (y compris le téléphone)');
       return;
     }
 
@@ -143,6 +183,24 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
     setError('');
 
     try {
+      if (selectedPlan === 'individual' || !selectedPlan) {
+        const { data: existingListings, error: checkError } = await supabase
+          .from('listings')
+          .select('id, seller_phone, seller_email')
+          .or(`seller_phone.eq.${formData.sellerPhone}${formData.sellerEmail ? `,seller_email.eq.${formData.sellerEmail}` : ''}`)
+          .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+
+        if (checkError) {
+          throw new Error('Erreur lors de la vérification des annonces existantes');
+        }
+
+        if (existingListings && existingListings.length >= 2) {
+          setError('Limite atteinte : Vous avez déjà publié 2 annonces gratuites dans les 30 derniers jours. Passez à un abonnement Pro ou Premium pour publier plus d\'annonces.');
+          setLoading(false);
+          return;
+        }
+      }
+
       let equipmentTypeId = formData.equipmentTypeId;
 
       if (useCustomType && formData.customEquipmentType) {
@@ -197,6 +255,8 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
         images: imageUrls,
         status: 'pending',
         is_active: true,
+        seller_phone: formData.sellerPhone,
+        seller_email: formData.sellerEmail || null,
         expires_at: expiresAt.toISOString(),
       };
 
@@ -616,28 +676,102 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
           </select>
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium mb-2 text-gray-700">
+              Téléphone de contact <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="tel"
+              value={formData.sellerPhone}
+              onChange={(e) => handleInputChange('sellerPhone', e.target.value)}
+              required
+              placeholder="06XXXXXXXX"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#156D3E]"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Les acheteurs vous contacteront sur ce numéro
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2 text-gray-700">
+              Email de contact {selectedPlan === 'individual' && <span className="text-gray-500">(Facultatif)</span>}
+              {(selectedPlan === 'pro' || selectedPlan === 'premium') && <span className="text-red-500">*</span>}
+            </label>
+            <input
+              type="email"
+              value={formData.sellerEmail}
+              onChange={(e) => handleInputChange('sellerEmail', e.target.value)}
+              required={selectedPlan === 'pro' || selectedPlan === 'premium'}
+              placeholder="votre@email.com"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#156D3E]"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              {selectedPlan === 'individual'
+                ? 'Facultatif pour les annonces gratuites'
+                : 'Obligatoire pour les comptes Pro et Premium'}
+            </p>
+          </div>
+        </div>
+
         <div>
           <label className="block text-sm font-medium mb-2 text-gray-700">
             Images (jusqu'à 6)
           </label>
+
+          <div className="mb-4">
+            <label
+              htmlFor="file-upload"
+              className={`flex items-center justify-center gap-3 px-6 py-4 border-2 border-dashed rounded-md cursor-pointer transition-colors ${
+                uploadingImage || imageUrls.length >= 6
+                  ? 'border-gray-300 bg-gray-50 cursor-not-allowed'
+                  : 'border-[#156D3E] bg-[#156D3E] bg-opacity-5 hover:bg-opacity-10'
+              }`}
+            >
+              <ImageIcon className="h-6 w-6 text-[#156D3E]" />
+              <span className="font-medium text-gray-700">
+                {uploadingImage
+                  ? 'Upload en cours...'
+                  : imageUrls.length >= 6
+                  ? 'Limite de 6 images atteinte'
+                  : 'Cliquez pour ajouter des images depuis vos fichiers'}
+              </span>
+              <Upload className="h-5 w-5 text-[#156D3E]" />
+            </label>
+            <input
+              id="file-upload"
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/webp"
+              multiple
+              onChange={handleFileUpload}
+              disabled={uploadingImage || imageUrls.length >= 6}
+              className="hidden"
+            />
+            <p className="text-xs text-gray-500 mt-2">
+              Formats acceptés : JPG, PNG, WEBP (max 5MB par image)
+            </p>
+          </div>
+
           <div className="mb-3">
+            <p className="text-sm text-gray-600 mb-2">Ou ajoutez une URL d'image :</p>
             <div className="flex gap-2">
               <input
                 type="url"
                 value={imageInput}
                 onChange={(e) => setImageInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addImageUrl())}
-                placeholder="URL de l'image"
+                placeholder="https://exemple.com/image.jpg"
                 className="flex-1 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#156D3E]"
               />
               <button
                 type="button"
                 onClick={addImageUrl}
                 disabled={imageUrls.length >= 6}
-                className="px-6 py-3 bg-[#156D3E] text-white rounded-md hover:bg-[#0f5630] disabled:bg-gray-300 transition-colors flex items-center gap-2"
+                className="px-6 py-3 bg-gray-500 text-white rounded-md hover:bg-gray-600 disabled:bg-gray-300 transition-colors flex items-center gap-2"
               >
                 <Upload className="h-5 w-5" />
-                Ajouter
+                Ajouter URL
               </button>
             </div>
           </div>
