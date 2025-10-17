@@ -17,13 +17,14 @@ export function SubscriptionSelectionPage({ onNavigate }: SubscriptionSelectionP
       icon: Check,
       color: 'gray',
       features: [
-        '1 annonce active',
-        'Durée de 15 jours',
+        '2 annonces par 30 jours',
+        'Durée de 30 jours',
         'Jusqu\'à 6 photos',
         'Support par email',
       ],
       highlight: false,
       cta: 'Publier gratuitement',
+      trial: false,
     },
     {
       id: 'pro',
@@ -32,16 +33,19 @@ export function SubscriptionSelectionPage({ onNavigate }: SubscriptionSelectionP
       icon: Star,
       color: 'green',
       features: [
-        '10 annonces actives',
+        'Annonces illimitées',
         'Badge "PRO" visible',
         'Durée de 30 jours',
         'Mise en avant des annonces',
         'Photos illimitées',
         'Support prioritaire',
+        'Statistiques détaillées',
       ],
       highlight: true,
-      cta: 'Choisir Pro',
+      cta: 'Essayer 30 jours gratuits',
       badge: 'Recommandé',
+      trial: true,
+      trialText: '30 jours gratuits - Sans carte bancaire',
     },
     {
       id: 'premium',
@@ -53,15 +57,17 @@ export function SubscriptionSelectionPage({ onNavigate }: SubscriptionSelectionP
         'Annonces illimitées',
         'Badge doré "PREMIUM"',
         'Durée illimitée',
-        '🔥 Publication prioritaire',
-        '🔥 Toujours en première position',
+        'Publication prioritaire',
+        'Toujours en première position',
         'Photos et vidéos illimitées',
         'Support VIP 24/7',
         'Statistiques avancées',
       ],
       highlight: false,
-      cta: 'Choisir Premium',
+      cta: 'Essayer 30 jours gratuits',
       badge: 'Meilleure visibilité',
+      trial: true,
+      trialText: '30 jours gratuits - Sans carte bancaire',
     },
   ];
 
@@ -128,6 +134,17 @@ export function SubscriptionSelectionPage({ onNavigate }: SubscriptionSelectionP
                   </li>
                 ))}
               </ul>
+
+              {plan.trial && (
+                <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                  <p className="text-green-800 font-semibold text-sm">
+                    Essayez gratuitement pendant 30 jours — sans carte bancaire requise.
+                  </p>
+                  <p className="text-green-700 text-xs mt-1">
+                    Publiez, testez, vendez — puis décidez !
+                  </p>
+                </div>
+              )}
 
               <button
                 onClick={() => handleSelectPlan(plan.id as any)}
