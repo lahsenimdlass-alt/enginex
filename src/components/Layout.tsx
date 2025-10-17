@@ -43,7 +43,10 @@ export function Layout({ children, currentPage = 'home', onNavigate }: LayoutPro
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Logo onClick={() => onNavigate('home')} />
+            <div className="flex flex-col">
+              <Logo onClick={() => onNavigate('home')} />
+              <p className="text-xs text-gray-600 mt-1 hidden sm:block">Votre marketplace d'équipements professionnels</p>
+            </div>
 
             <div className="hidden md:flex items-center space-x-1">
               {navItems.map((item) => (
