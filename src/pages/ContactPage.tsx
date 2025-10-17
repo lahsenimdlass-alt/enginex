@@ -152,8 +152,8 @@ export function ContactPage() {
               </div>
               <div>
                 <h3 className="font-semibold mb-1 text-gray-900">Email</h3>
-                <p className="text-gray-600">contact@enginex.ma</p>
-                <p className="text-gray-600">support@enginex.ma</p>
+                <p className="text-gray-600">enginex.ma@gmail.com</p>
+                <p className="text-gray-600">Contact professionnel</p>
               </div>
             </div>
 
