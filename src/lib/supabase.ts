@@ -14,6 +14,10 @@ export type Profile = {
   account_type_label: 'Particulier' | 'Professionnel';
   profile_image_url: string | null;
   subscription_expires_at: string | null;
+  is_admin: boolean;
+  free_listings_count: number;
+  free_listings_reset_at: string | null;
+  trial_expires_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -53,6 +57,8 @@ export type Listing = {
   is_active: boolean;
   priority_score: number;
   views_count: number;
+  seller_phone: string | null;
+  seller_email: string | null;
   expires_at: string | null;
   created_at: string;
   updated_at: string;
