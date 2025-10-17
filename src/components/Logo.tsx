@@ -15,7 +15,7 @@ export function Logo({ className = '', size = 'md', onClick }: LogoProps) {
 
   return (
     <div
-      className={`flex items-center gap-2 ${onClick ? 'cursor-pointer' : ''} ${className}`}
+      className={`flex items-center gap-3 ${onClick ? 'cursor-pointer' : ''} ${className}`}
       onClick={onClick}
     >
       <div className={`${sizeClasses.container} relative`}>
@@ -25,55 +25,83 @@ export function Logo({ className = '', size = 'md', onClick }: LogoProps) {
           viewBox="0 0 100 100"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="drop-shadow-md"
+          className="drop-shadow-lg"
         >
-          <circle cx="50" cy="50" r="48" fill="#156D3E" />
+          <defs>
+            <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style={{ stopColor: '#15803d', stopOpacity: 1 }} />
+              <stop offset="100%" style={{ stopColor: '#166534', stopOpacity: 1 }} />
+            </linearGradient>
+            <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style={{ stopColor: '#f97316', stopOpacity: 1 }} />
+              <stop offset="100%" style={{ stopColor: '#ea580c', stopOpacity: 1 }} />
+            </linearGradient>
+          </defs>
 
-          <rect x="25" y="55" width="50" height="8" rx="2" fill="white" />
+          <rect x="2" y="2" width="96" height="96" rx="20" fill="url(#primaryGrad)" />
 
           <path
-            d="M30 55 L30 45 L40 40 L60 40 L70 45 L70 55"
+            d="M30 62 L30 48 L40 42 L60 42 L70 48 L70 62"
             stroke="white"
-            strokeWidth="3"
+            strokeWidth="4"
             fill="none"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
 
-          <circle cx="35" cy="67" r="6" fill="white" />
-          <circle cx="35" cy="67" r="3" fill="#156D3E" />
+          <rect x="25" y="60" width="50" height="10" rx="3" fill="white" />
 
-          <circle cx="65" cy="67" r="6" fill="white" />
-          <circle cx="65" cy="67" r="3" fill="#156D3E" />
+          <circle cx="35" cy="75" r="7" fill="white" />
+          <circle cx="35" cy="75" r="4" fill="url(#accentGrad)" />
+
+          <circle cx="65" cy="75" r="7" fill="white" />
+          <circle cx="65" cy="75" r="4" fill="url(#accentGrad)" />
 
           <path
-            d="M40 30 L42 25 L48 25 L50 30"
-            stroke="white"
-            strokeWidth="2.5"
+            d="M42 32 L45 26 L55 26 L58 32"
+            stroke="url(#accentGrad)"
+            strokeWidth="3.5"
             fill="none"
             strokeLinecap="round"
           />
 
+          <rect x="43" y="48" width="5" height="10" rx="1.5" fill="white" opacity="0.8" />
+          <rect x="52" y="48" width="5" height="10" rx="1.5" fill="white" opacity="0.8" />
+
           <path
-            d="M52 30 L54 25 L60 25 L62 30"
+            d="M20 38 L25 33 L30 38"
             stroke="white"
             strokeWidth="2.5"
             fill="none"
             strokeLinecap="round"
+            strokeLinejoin="round"
           />
 
-          <rect x="42" y="45" width="6" height="8" rx="1" fill="white" opacity="0.7" />
-          <rect x="52" y="45" width="6" height="8" rx="1" fill="white" opacity="0.7" />
+          <path
+            d="M70 38 L75 33 L80 38"
+            stroke="white"
+            strokeWidth="2.5"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+
+          <circle cx="50" cy="50" r="2.5" fill="url(#accentGrad)" opacity="0.6" />
         </svg>
       </div>
 
       <div className="flex flex-col leading-none">
-        <span className={`${sizeClasses.text} font-bold text-[#156D3E] tracking-tight`}>
-          Engine<span className="text-[#0f5630]">x</span>
+        <span className={`${sizeClasses.text} font-extrabold tracking-tight`}>
+          <span className="bg-gradient-to-r from-green-700 to-green-800 bg-clip-text text-transparent">
+            Engine
+          </span>
+          <span className="bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
+            X
+          </span>
         </span>
         {size !== 'sm' && (
-          <span className="text-[10px] text-gray-600 font-medium tracking-wider uppercase">
-            Maroc
+          <span className="text-[11px] text-gray-600 font-semibold tracking-widest uppercase mt-0.5">
+            .ma
           </span>
         )}
       </div>
