@@ -16,6 +16,7 @@ import { TermsPage } from './pages/TermsPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { ListingDetailPage } from './pages/ListingDetailPage';
+import { AdminDashboardPage } from './pages/AdminDashboardPage';
 
 type Page =
   | 'home'
@@ -25,6 +26,7 @@ type Page =
   | 'subscriptions'
   | 'my-listings'
   | 'dashboard'
+  | 'admin'
   | 'profile'
   | 'notifications'
   | 'contact'
@@ -60,6 +62,8 @@ function App() {
         return <MyListingsPage onNavigate={handleNavigate} />;
       case 'dashboard':
         return <DashboardPage onNavigate={handleNavigate} />;
+      case 'admin':
+        return <AdminDashboardPage onNavigate={handleNavigate} />;
       case 'profile':
         return <ProfilePage onNavigate={handleNavigate} />;
       case 'notifications':
