@@ -299,15 +299,15 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
                           {listing.description}
                         </p>
 
-                        {listing.seller_phone && (
+                        {listing.contact_phone && (
                           <p className="text-sm text-gray-700 mb-1">
-                            <strong>Téléphone :</strong> {listing.seller_phone}
+                            <strong>Téléphone :</strong> {listing.contact_phone}
                           </p>
                         )}
 
-                        {listing.seller_email && (
+                        {listing.contact_email && (
                           <p className="text-sm text-gray-700 mb-3">
-                            <strong>Email :</strong> {listing.seller_email}
+                            <strong>Email :</strong> {listing.contact_email}
                           </p>
                         )}
 
