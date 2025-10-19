@@ -55,8 +55,8 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
     brand: '',
     model: '',
     condition: 'used' as 'new' | 'good' | 'used',
-    sellerPhone: '',
-    sellerEmail: '',
+    contactPhone: '',
+    contactEmail: '',
   });
 
   const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -174,7 +174,7 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.categoryId || (!formData.equipmentTypeId && !formData.customEquipmentType) || !formData.title || !formData.description || !formData.price || !formData.region || !formData.city || !formData.sellerPhone) {
+    if (!formData.categoryId || (!formData.equipmentTypeId && !formData.customEquipmentType) || !formData.title || !formData.description || !formData.price || !formData.region || !formData.city || !formData.contactPhone) {
       setError('Veuillez remplir tous les champs obligatoires (y compris le téléphone)');
       return;
     }
@@ -184,13 +184,21 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
 
     try {
       if (selectedPlan === 'individual' || !selectedPlan) {
-        const { data: existingListings, error: checkError } = await supabase
+        let query = supabase
           .from('listings')
-          .select('id, seller_phone, seller_email')
-          .or(`seller_phone.eq.${formData.sellerPhone}${formData.sellerEmail ? `,seller_email.eq.${formData.sellerEmail}` : ''}`)
+          .select('id, contact_phone, contact_email')
           .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
 
+        if (formData.contactEmail) {
+          query = query.or(`contact_phone.eq.${formData.contactPhone},contact_email.eq.${formData.contactEmail}`);
+        } else {
+          query = query.eq('contact_phone', formData.contactPhone);
+        }
+
+        const { data: existingListings, error: checkError } = await query;
+
         if (checkError) {
+          console.error('Check error:', checkError);
           throw new Error('Erreur lors de la vérification des annonces existantes');
         }
 
@@ -241,6 +249,7 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
       }
 
       const listingData: any = {
+        user_id: null,
         category_id: formData.categoryId,
         equipment_type_id: equipmentTypeId,
         title: formData.title,
@@ -255,8 +264,8 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
         images: imageUrls,
         status: 'pending',
         is_active: true,
-        seller_phone: formData.sellerPhone,
-        seller_email: formData.sellerEmail || null,
+        contact_phone: formData.contactPhone,
+        contact_email: formData.contactEmail || null,
         expires_at: expiresAt.toISOString(),
       };
 
@@ -273,22 +282,6 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
             .eq('id', user.id);
 
           if (profileError) throw profileError;
-        }
-      } else {
-        const tempUser = await supabase.auth.signUp({
-          email: `temp-${Date.now()}@enginex.ma`,
-          password: Math.random().toString(36).slice(-8),
-        });
-
-        if (tempUser.data.user) {
-          await supabase.from('profiles').insert({
-            id: tempUser.data.user.id,
-            full_name: 'Utilisateur Anonyme',
-            email: `temp-${Date.now()}@enginex.ma`,
-            account_type: 'individual',
-          });
-
-          listingData.user_id = tempUser.data.user.id;
         }
       }
 
@@ -683,8 +676,8 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
             </label>
             <input
               type="tel"
-              value={formData.sellerPhone}
-              onChange={(e) => handleInputChange('sellerPhone', e.target.value)}
+              value={formData.contactPhone}
+              onChange={(e) => handleInputChange('contactPhone', e.target.value)}
               required
               placeholder="06XXXXXXXX"
               className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#156D3E]"
@@ -701,8 +694,8 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
             </label>
             <input
               type="email"
-              value={formData.sellerEmail}
-              onChange={(e) => handleInputChange('sellerEmail', e.target.value)}
+              value={formData.contactEmail}
+              onChange={(e) => handleInputChange('contactEmail', e.target.value)}
               required={selectedPlan === 'pro' || selectedPlan === 'premium'}
               placeholder="votre@email.com"
               className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#156D3E]"
