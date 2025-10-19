@@ -57,8 +57,8 @@ export type Listing = {
   is_active: boolean;
   priority_score: number;
   views_count: number;
-  seller_phone: string | null;
-  seller_email: string | null;
+  contact_phone: string | null;
+  contact_email: string | null;
   expires_at: string | null;
   created_at: string;
   updated_at: string;
