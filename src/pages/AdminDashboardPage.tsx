@@ -63,15 +63,15 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
   const approveListing = async (listingId: string) => {
     setLoadingListingId(listingId)
     try {
-      const { error } = await supabase.from("listings").update({ status: "approved" }).eq("id", listingId)
+      const response = await supabase.from("listings").update({ status: "approved" }).eq("id", listingId)
 
-      if (error) {
+      if (response.error) {
         toast({
           title: "Erreur",
-          description: `Impossible d'approuver l'annonce: ${error.message}`,
+          description: `Impossible d'approuver l'annonce: ${response.error.message || "Erreur inconnue"}`,
           variant: "destructive",
         })
-        console.error("[v0] Approve error:", error)
+        console.error("[v0] Approve error:", response.error)
       } else {
         toast({
           title: "Succès",
@@ -95,15 +95,15 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
   const rejectListing = async (listingId: string) => {
     setLoadingListingId(listingId)
     try {
-      const { error } = await supabase.from("listings").update({ status: "rejected" }).eq("id", listingId)
+      const response = await supabase.from("listings").update({ status: "rejected" }).eq("id", listingId)
 
-      if (error) {
+      if (response.error) {
         toast({
           title: "Erreur",
-          description: `Impossible de rejeter l'annonce: ${error.message}`,
+          description: `Impossible de rejeter l'annonce: ${response.error.message || "Erreur inconnue"}`,
           variant: "destructive",
         })
-        console.error("[v0] Reject error:", error)
+        console.error("[v0] Reject error:", response.error)
       } else {
         toast({
           title: "Succès",
@@ -129,15 +129,15 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
 
     setLoadingListingId(listingId)
     try {
-      const { error } = await supabase.from("listings").delete().eq("id", listingId)
+      const response = await supabase.from("listings").delete().eq("id", listingId)
 
-      if (error) {
+      if (response.error) {
         toast({
           title: "Erreur",
-          description: `Impossible de supprimer l'annonce: ${error.message}`,
+          description: `Impossible de supprimer l'annonce: ${response.error.message || "Erreur inconnue"}`,
           variant: "destructive",
         })
-        console.error("[v0] Delete error:", error)
+        console.error("[v0] Delete error:", response.error)
       } else {
         toast({
           title: "Succès",
