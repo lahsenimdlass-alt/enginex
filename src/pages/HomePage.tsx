@@ -254,6 +254,54 @@ export function HomePage({ onNavigate }: HomePageProps) {
         </div>
       </section>
 
+      <section className="py-16 px-4 bg-gradient-to-br from-green-50 to-blue-50">
+        <div className="max-w-5xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 border-2 border-green-200">
+            <div className="text-center mb-8">
+              <span className="inline-block bg-gradient-to-r from-[#156D3E] to-green-600 text-white px-6 py-2 rounded-full font-bold text-lg mb-4">
+                Offre de lancement
+              </span>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
+                Essayez l'abonnement Pro et Premium gratuitement pendant 60 jours
+              </h2>
+              <p className="text-xl text-gray-600 mb-6">
+                Testez toutes les fonctionnalités premium sans engagement et sans carte bancaire
+              </p>
+              <button
+                onClick={() => onNavigate('subscription-selection')}
+                className="bg-gradient-to-r from-[#156D3E] to-green-600 text-white px-8 py-4 rounded-lg hover:from-[#0f5630] hover:to-green-700 transition-all font-semibold text-lg inline-flex items-center shadow-lg"
+              >
+                Profiter de l'offre maintenant
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg">
+                <span className="text-green-600 text-2xl">✓</span>
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-1">Annonces illimitées</h4>
+                  <p className="text-sm text-gray-600">Publiez autant d'annonces que vous voulez</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg">
+                <span className="text-green-600 text-2xl">✓</span>
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-1">Badge PRO ou PREMIUM</h4>
+                  <p className="text-sm text-gray-600">Augmentez votre crédibilité et visibilité</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg">
+                <span className="text-green-600 text-2xl">✓</span>
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-1">60 jours gratuits</h4>
+                  <p className="text-sm text-gray-600">Sans engagement ni carte bancaire</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
@@ -300,7 +348,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
             Rejoignez des milliers de professionnels qui font confiance à notre plateforme
           </p>
           <button
-            onClick={() => onNavigate('publish')}
+            onClick={() => onNavigate('subscription-selection')}
             className="bg-white text-[#156D3E] px-8 py-4 rounded-md hover:bg-gray-100 transition-colors font-semibold text-lg inline-flex items-center shadow-lg"
           >
             Publier une annonce maintenant
