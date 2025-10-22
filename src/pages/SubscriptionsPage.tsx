@@ -54,7 +54,7 @@ export function SubscriptionsPage({ onNavigate }: SubscriptionsPageProps) {
       price: '0 MAD',
       duration: '',
       features: [
-        '1 annonce active',
+        '2 annonces par 30 jours',
         'Durée de 15 jours',
         'Photos limitées',
         'Support par email',
