@@ -15,80 +15,65 @@ export function Logo({ className = '', size = 'md', onClick }: LogoProps) {
 
   return (
     <div
-      className={`flex items-center gap-3 ${onClick ? 'cursor-pointer' : ''} ${className}`}
+      className={`flex items-center gap-2 ${onClick ? 'cursor-pointer' : ''} ${className}`}
       onClick={onClick}
     >
       <div className={`${sizeClasses.container} relative`}>
         <svg
-          width={sizeClasses.icon * 1.2}
+          width={sizeClasses.icon}
           height={sizeClasses.icon}
-          viewBox="0 0 120 100"
+          viewBox="0 0 100 100"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="drop-shadow-md"
         >
-          {/* Yellow gear background */}
-          <circle cx="60" cy="35" r="28" fill="#F5B700" />
+          <circle cx="50" cy="50" r="48" fill="#156D3E" />
 
-          {/* Gear teeth */}
-          <g fill="#F5B700">
-            <rect x="57" y="5" width="6" height="8" rx="1" />
-            <rect x="77" y="12" width="6" height="8" rx="1" transform="rotate(45 80 16)" />
-            <rect x="86" y="32" width="8" height="6" rx="1" />
-            <rect x="77" y="52" width="6" height="8" rx="1" transform="rotate(-45 80 56)" />
-            <rect x="57" y="59" width="6" height="8" rx="1" />
-            <rect x="37" y="52" width="6" height="8" rx="1" transform="rotate(45 40 56)" />
-            <rect x="28" y="32" width="8" height="6" rx="1" />
-            <rect x="37" y="12" width="6" height="8" rx="1" transform="rotate(-45 40 16)" />
-          </g>
+          <rect x="25" y="55" width="50" height="8" rx="2" fill="white" />
 
-          {/* Green tractor body */}
           <path
-            d="M 35 50 L 35 42 L 45 38 L 75 38 L 85 42 L 85 50 Z"
-            fill="#156D3E"
+            d="M30 55 L30 45 L40 40 L60 40 L70 45 L70 55"
+            stroke="white"
+            strokeWidth="3"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
 
-          {/* Tractor cabin windows */}
-          <rect x="48" y="42" width="7" height="6" rx="1" fill="#FFFFFF" opacity="0.8" />
-          <rect x="58" y="42" width="7" height="6" rx="1" fill="#FFFFFF" opacity="0.8" />
-          <rect x="68" y="42" width="7" height="6" rx="1" fill="#FFFFFF" opacity="0.8" />
+          <circle cx="35" cy="67" r="6" fill="white" />
+          <circle cx="35" cy="67" r="3" fill="#156D3E" />
 
-          {/* Tractor base */}
-          <rect x="32" y="50" width="56" height="8" rx="2" fill="#156D3E" />
+          <circle cx="65" cy="67" r="6" fill="white" />
+          <circle cx="65" cy="67" r="3" fill="#156D3E" />
 
-          {/* Treads/tracks pattern */}
-          <g fill="#0f5630">
-            <rect x="35" y="52" width="3" height="4" rx="0.5" />
-            <rect x="40" y="52" width="3" height="4" rx="0.5" />
-            <rect x="45" y="52" width="3" height="4" rx="0.5" />
-            <rect x="50" y="52" width="3" height="4" rx="0.5" />
-            <rect x="55" y="52" width="3" height="4" rx="0.5" />
-            <rect x="60" y="52" width="3" height="4" rx="0.5" />
-            <rect x="65" y="52" width="3" height="4" rx="0.5" />
-            <rect x="70" y="52" width="3" height="4" rx="0.5" />
-            <rect x="75" y="52" width="3" height="4" rx="0.5" />
-            <rect x="80" y="52" width="3" height="4" rx="0.5" />
-          </g>
+          <path
+            d="M40 30 L42 25 L48 25 L50 30"
+            stroke="white"
+            strokeWidth="2.5"
+            fill="none"
+            strokeLinecap="round"
+          />
 
-          {/* Small wheel (front) */}
-          <circle cx="42" cy="65" r="7" fill="#0f5630" />
-          <circle cx="42" cy="65" r="5" fill="#F5B700" />
-          <circle cx="42" cy="65" r="2.5" fill="#0f5630" />
+          <path
+            d="M52 30 L54 25 L60 25 L62 30"
+            stroke="white"
+            strokeWidth="2.5"
+            fill="none"
+            strokeLinecap="round"
+          />
 
-          {/* Large wheel (back) */}
-          <circle cx="78" cy="68" r="10" fill="#0f5630" />
-          <circle cx="78" cy="68" r="7" fill="#F5B700" />
-          <circle cx="78" cy="68" r="4" fill="#0f5630" />
+          <rect x="42" y="45" width="6" height="8" rx="1" fill="white" opacity="0.7" />
+          <rect x="52" y="45" width="6" height="8" rx="1" fill="white" opacity="0.7" />
         </svg>
       </div>
 
       <div className="flex flex-col leading-none">
         <span className={`${sizeClasses.text} font-bold text-[#156D3E] tracking-tight`}>
-          ENGINEX
+          Engine<span className="text-[#0f5630]">x</span>
         </span>
         {size !== 'sm' && (
-          <span className="text-[11px] text-[#9ACD32] font-semibold tracking-wider uppercase">
-            MAROC
+          <span className="text-[10px] text-gray-600 font-medium tracking-wider uppercase">
+            Maroc
           </span>
         )}
       </div>
