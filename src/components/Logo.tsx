@@ -20,88 +20,75 @@ export function Logo({ className = '', size = 'md', onClick }: LogoProps) {
     >
       <div className={`${sizeClasses.container} relative`}>
         <svg
-          width={sizeClasses.icon}
+          width={sizeClasses.icon * 1.2}
           height={sizeClasses.icon}
-          viewBox="0 0 100 100"
+          viewBox="0 0 120 100"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="drop-shadow-lg"
+          className="drop-shadow-md"
         >
-          <defs>
-            <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style={{ stopColor: '#15803d', stopOpacity: 1 }} />
-              <stop offset="100%" style={{ stopColor: '#166534', stopOpacity: 1 }} />
-            </linearGradient>
-            <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style={{ stopColor: '#f97316', stopOpacity: 1 }} />
-              <stop offset="100%" style={{ stopColor: '#ea580c', stopOpacity: 1 }} />
-            </linearGradient>
-          </defs>
+          {/* Yellow gear background */}
+          <circle cx="60" cy="35" r="28" fill="#F5B700" />
 
-          <rect x="2" y="2" width="96" height="96" rx="20" fill="url(#primaryGrad)" />
+          {/* Gear teeth */}
+          <g fill="#F5B700">
+            <rect x="57" y="5" width="6" height="8" rx="1" />
+            <rect x="77" y="12" width="6" height="8" rx="1" transform="rotate(45 80 16)" />
+            <rect x="86" y="32" width="8" height="6" rx="1" />
+            <rect x="77" y="52" width="6" height="8" rx="1" transform="rotate(-45 80 56)" />
+            <rect x="57" y="59" width="6" height="8" rx="1" />
+            <rect x="37" y="52" width="6" height="8" rx="1" transform="rotate(45 40 56)" />
+            <rect x="28" y="32" width="8" height="6" rx="1" />
+            <rect x="37" y="12" width="6" height="8" rx="1" transform="rotate(-45 40 16)" />
+          </g>
 
+          {/* Green tractor body */}
           <path
-            d="M30 62 L30 48 L40 42 L60 42 L70 48 L70 62"
-            stroke="white"
-            strokeWidth="4"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+            d="M 35 50 L 35 42 L 45 38 L 75 38 L 85 42 L 85 50 Z"
+            fill="#156D3E"
           />
 
-          <rect x="25" y="60" width="50" height="10" rx="3" fill="white" />
+          {/* Tractor cabin windows */}
+          <rect x="48" y="42" width="7" height="6" rx="1" fill="#FFFFFF" opacity="0.8" />
+          <rect x="58" y="42" width="7" height="6" rx="1" fill="#FFFFFF" opacity="0.8" />
+          <rect x="68" y="42" width="7" height="6" rx="1" fill="#FFFFFF" opacity="0.8" />
 
-          <circle cx="35" cy="75" r="7" fill="white" />
-          <circle cx="35" cy="75" r="4" fill="url(#accentGrad)" />
+          {/* Tractor base */}
+          <rect x="32" y="50" width="56" height="8" rx="2" fill="#156D3E" />
 
-          <circle cx="65" cy="75" r="7" fill="white" />
-          <circle cx="65" cy="75" r="4" fill="url(#accentGrad)" />
+          {/* Treads/tracks pattern */}
+          <g fill="#0f5630">
+            <rect x="35" y="52" width="3" height="4" rx="0.5" />
+            <rect x="40" y="52" width="3" height="4" rx="0.5" />
+            <rect x="45" y="52" width="3" height="4" rx="0.5" />
+            <rect x="50" y="52" width="3" height="4" rx="0.5" />
+            <rect x="55" y="52" width="3" height="4" rx="0.5" />
+            <rect x="60" y="52" width="3" height="4" rx="0.5" />
+            <rect x="65" y="52" width="3" height="4" rx="0.5" />
+            <rect x="70" y="52" width="3" height="4" rx="0.5" />
+            <rect x="75" y="52" width="3" height="4" rx="0.5" />
+            <rect x="80" y="52" width="3" height="4" rx="0.5" />
+          </g>
 
-          <path
-            d="M42 32 L45 26 L55 26 L58 32"
-            stroke="url(#accentGrad)"
-            strokeWidth="3.5"
-            fill="none"
-            strokeLinecap="round"
-          />
+          {/* Small wheel (front) */}
+          <circle cx="42" cy="65" r="7" fill="#0f5630" />
+          <circle cx="42" cy="65" r="5" fill="#F5B700" />
+          <circle cx="42" cy="65" r="2.5" fill="#0f5630" />
 
-          <rect x="43" y="48" width="5" height="10" rx="1.5" fill="white" opacity="0.8" />
-          <rect x="52" y="48" width="5" height="10" rx="1.5" fill="white" opacity="0.8" />
-
-          <path
-            d="M20 38 L25 33 L30 38"
-            stroke="white"
-            strokeWidth="2.5"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-
-          <path
-            d="M70 38 L75 33 L80 38"
-            stroke="white"
-            strokeWidth="2.5"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-
-          <circle cx="50" cy="50" r="2.5" fill="url(#accentGrad)" opacity="0.6" />
+          {/* Large wheel (back) */}
+          <circle cx="78" cy="68" r="10" fill="#0f5630" />
+          <circle cx="78" cy="68" r="7" fill="#F5B700" />
+          <circle cx="78" cy="68" r="4" fill="#0f5630" />
         </svg>
       </div>
 
       <div className="flex flex-col leading-none">
-        <span className={`${sizeClasses.text} font-extrabold tracking-tight`}>
-          <span className="bg-gradient-to-r from-green-700 to-green-800 bg-clip-text text-transparent">
-            Engine
-          </span>
-          <span className="bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
-            X
-          </span>
+        <span className={`${sizeClasses.text} font-bold text-[#156D3E] tracking-tight`}>
+          ENGINEX
         </span>
         {size !== 'sm' && (
-          <span className="text-[11px] text-gray-600 font-semibold tracking-widest uppercase mt-0.5">
-            .ma
+          <span className="text-[11px] text-[#9ACD32] font-semibold tracking-wider uppercase">
+            MAROC
           </span>
         )}
       </div>
