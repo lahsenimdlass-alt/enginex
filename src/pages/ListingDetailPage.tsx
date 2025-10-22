@@ -37,14 +37,16 @@ export function ListingDetailPage({ listingId, onNavigate }: ListingDetailPagePr
     if (listingData) {
       setListing(listingData);
 
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', listingData.user_id)
-        .maybeSingle();
+      if (listingData.user_id) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', listingData.user_id)
+          .maybeSingle();
 
-      if (profileData) {
-        setSeller(profileData);
+        if (profileData) {
+          setSeller(profileData);
+        }
       }
     }
 
@@ -210,7 +212,7 @@ export function ListingDetailPage({ listingId, onNavigate }: ListingDetailPagePr
           <div className="bg-white rounded-lg shadow-md p-6 sticky top-20">
             <h2 className="text-xl font-bold mb-4 text-gray-900">Informations vendeur</h2>
 
-            {seller && (
+            {seller ? (
               <div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Nom</p>
@@ -249,6 +251,34 @@ export function ListingDetailPage({ listingId, onNavigate }: ListingDetailPagePr
                     Contacter le vendeur
                   </button>
                 </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-gray-600">Informations du vendeur non disponibles pour cette annonce.</p>
+                {listing.contact_phone && (
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">Téléphone</p>
+                    <a
+                      href={`tel:${listing.contact_phone}`}
+                      className="flex items-center gap-2 text-[#156D3E] hover:underline"
+                    >
+                      <Phone className="h-4 w-4" />
+                      {listing.contact_phone}
+                    </a>
+                  </div>
+                )}
+                {listing.contact_email && (
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">Email</p>
+                    <a
+                      href={`mailto:${listing.contact_email}`}
+                      className="flex items-center gap-2 text-[#156D3E] hover:underline break-all"
+                    >
+                      <Mail className="h-4 w-4 flex-shrink-0" />
+                      {listing.contact_email}
+                    </a>
+                  </div>
+                )}
               </div>
             )}
           </div>
