@@ -44,7 +44,10 @@ export function HomePage({ onNavigate }: HomePageProps) {
   const loadLatestListings = async () => {
     const { data } = await supabase
       .from('listings')
-      .select('*')
+      .select(`
+        *,
+        profile:profiles!listings_user_id_fkey(account_type)
+      `)
       .eq('status', 'approved')
       .eq('is_active', true)
       .order('priority_score', { ascending: false })
@@ -238,13 +241,13 @@ export function HomePage({ onNavigate }: HomePageProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {latestListings.map((listing) => (
+            {latestListings.slice(0, 6).map((listing) => (
               <div
                 key={listing.id}
                 onClick={() => onNavigate('listing-detail', { id: listing.id })}
                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
               >
-                <div className="h-48 bg-gray-200 flex items-center justify-center">
+                <div className="h-48 bg-gray-200 flex items-center justify-center relative">
                   {listing.images && listing.images.length > 0 ? (
                     <img
                       src={listing.images[0]}
@@ -256,9 +259,21 @@ export function HomePage({ onNavigate }: HomePageProps) {
                   )}
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-lg mb-2 text-gray-900 truncate">
-                    {listing.title}
-                  </h3>
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="font-semibold text-lg text-gray-900 truncate flex-1">
+                      {listing.title}
+                    </h3>
+                    {(listing as any).profile?.account_type === 'pro' && (
+                      <span className="ml-2 px-2 py-0.5 bg-[#156D3E] text-white text-xs font-semibold rounded whitespace-nowrap">
+                        PRO
+                      </span>
+                    )}
+                    {(listing as any).profile?.account_type === 'premium' && (
+                      <span className="ml-2 px-2 py-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-xs font-semibold rounded whitespace-nowrap">
+                        PREMIUM
+                      </span>
+                    )}
+                  </div>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-2xl font-bold text-[#156D3E]">
                       {listing.price.toLocaleString()} MAD
