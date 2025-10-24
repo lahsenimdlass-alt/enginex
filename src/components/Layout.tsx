@@ -204,7 +204,7 @@ export function Layout({ children, currentPage = 'home', onNavigate }: LayoutPro
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => onNavigate('publish')} className="text-gray-400 hover:text-white transition-colors">
+                  <button onClick={() => onNavigate('subscription-selection')} className="text-gray-400 hover:text-white transition-colors">
                     Publier une annonce
                   </button>
                 </li>
