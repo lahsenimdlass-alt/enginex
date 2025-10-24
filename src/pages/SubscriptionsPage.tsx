@@ -168,7 +168,7 @@ export function SubscriptionsPage({ onNavigate }: SubscriptionsPageProps) {
               )}
 
               <button
-                onClick={() => handleSubscribe(plan.name)}
+                onClick={() => handleSubscribe(plan.id)}
                 disabled={profile?.account_type === plan.id}
                 className={`w-full py-3 rounded-md font-semibold transition-colors ${
                   plan.highlight
