@@ -62,4 +62,7 @@ export type Listing = {
   expires_at: string | null;
   created_at: string;
   updated_at: string;
+  profile?: {
+    account_type: 'individual' | 'pro' | 'premium';
+  };
 };
