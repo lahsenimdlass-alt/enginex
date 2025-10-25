@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Tractor, Construction, ArrowRight } from 'lucide-react';
+import { Search, Tractor, Construction, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase, Category, Listing } from '../lib/supabase';
 
 type HomePageProps = {
@@ -27,6 +27,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('');
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     loadCategories();
@@ -41,6 +42,17 @@ export function HomePage({ onNavigate }: HomePageProps) {
     if (data) setCategories(data);
   };
 
+  const itemsPerSlide = 3;
+  const totalSlides = Math.ceil(latestListings.length / itemsPerSlide);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % totalSlides);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
+  };
+
   const loadLatestListings = async () => {
     const { data } = await supabase
       .from('listings')
@@ -52,7 +64,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
       .eq('is_active', true)
       .order('priority_score', { ascending: false })
       .order('created_at', { ascending: false })
-      .limit(6);
+      .limit(12);
     if (data) {
       console.log('🔍 Listings loaded:', data);
       data.forEach(listing => {
@@ -250,8 +262,19 @@ export function HomePage({ onNavigate }: HomePageProps) {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {latestListings.slice(0, 6).map((listing) => (
+          {latestListings.length > 0 && (
+            <div className="relative">
+              <div className="overflow-hidden">
+                <div
+                  className="flex transition-transform duration-500 ease-in-out"
+                  style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                >
+                  {Array.from({ length: totalSlides }).map((_, slideIndex) => (
+                    <div key={slideIndex} className="w-full flex-shrink-0">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
+                        {latestListings
+                          .slice(slideIndex * itemsPerSlide, (slideIndex + 1) * itemsPerSlide)
+                          .map((listing) => (
               <div
                 key={listing.id}
                 onClick={() => onNavigate('listing-detail', { id: listing.id })}
@@ -305,8 +328,46 @@ export function HomePage({ onNavigate }: HomePageProps) {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+                          ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {totalSlides > 1 && (
+                <>
+                  <button
+                    onClick={prevSlide}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white hover:bg-gray-100 text-gray-800 p-4 rounded-full shadow-xl transition-all hover:scale-110 z-10"
+                    aria-label="Annonces précédentes"
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </button>
+                  <button
+                    onClick={nextSlide}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white hover:bg-gray-100 text-gray-800 p-4 rounded-full shadow-xl transition-all hover:scale-110 z-10"
+                    aria-label="Annonces suivantes"
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </button>
+
+                  <div className="flex justify-center gap-2 mt-8">
+                    {Array.from({ length: totalSlides }).map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentSlide(index)}
+                        className={`h-2.5 rounded-full transition-all ${
+                          currentSlide === index ? 'w-8 bg-[#156D3E]' : 'w-2.5 bg-gray-400 hover:bg-gray-600'
+                        }`}
+                        aria-label={`Aller à la page ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
           {latestListings.length === 0 && (
             <div className="text-center py-12">
