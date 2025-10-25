@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MapPin, Calendar, Package, Tag, Phone, Mail, ArrowLeft } from 'lucide-react';
+import { MapPin, Calendar, Package, Tag, Phone, Mail, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase, Listing, Profile } from '../lib/supabase';
 
 type ListingDetailPageProps = {
@@ -37,14 +37,16 @@ export function ListingDetailPage({ listingId, onNavigate }: ListingDetailPagePr
     if (listingData) {
       setListing(listingData);
 
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', listingData.user_id)
-        .maybeSingle();
+      if (listingData.user_id) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', listingData.user_id)
+          .maybeSingle();
 
-      if (profileData) {
-        setSeller(profileData);
+        if (profileData) {
+          setSeller(profileData);
+        }
       }
     }
 
@@ -88,13 +90,42 @@ export function ListingDetailPage({ listingId, onNavigate }: ListingDetailPagePr
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-            <div className="h-96 bg-gray-200 flex items-center justify-center">
+            <div className="relative h-96 bg-gray-200 flex items-center justify-center group">
               {listing.images && listing.images.length > 0 ? (
-                <img
-                  src={listing.images[selectedImage]}
-                  alt={listing.title}
-                  className="w-full h-full object-contain"
-                />
+                <>
+                  <img
+                    src={listing.images[selectedImage]}
+                    alt={listing.title}
+                    className="w-full h-full object-contain"
+                  />
+                  {listing.images.length > 1 && (
+                    <>
+                      <button
+                        onClick={() => setSelectedImage(selectedImage === 0 ? listing.images!.length - 1 : selectedImage - 1)}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <ChevronLeft className="h-6 w-6" />
+                      </button>
+                      <button
+                        onClick={() => setSelectedImage(selectedImage === listing.images!.length - 1 ? 0 : selectedImage + 1)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <ChevronRight className="h-6 w-6" />
+                      </button>
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                        {listing.images.map((_, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setSelectedImage(index)}
+                            className={`h-2 rounded-full transition-all ${
+                              selectedImage === index ? 'w-8 bg-white' : 'w-2 bg-white/50'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </>
               ) : (
                 <Package className="h-24 w-24 text-gray-400" />
               )}
@@ -106,8 +137,8 @@ export function ListingDetailPage({ listingId, onNavigate }: ListingDetailPagePr
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`flex-shrink-0 h-20 w-20 rounded border-2 overflow-hidden ${
-                      selectedImage === index ? 'border-[#156D3E]' : 'border-gray-300'
+                    className={`flex-shrink-0 h-20 w-20 rounded border-2 overflow-hidden transition-all ${
+                      selectedImage === index ? 'border-[#156D3E] shadow-lg' : 'border-gray-300 hover:border-gray-400'
                     }`}
                   >
                     <img src={img} alt={`Image ${index + 1}`} className="w-full h-full object-cover" />
@@ -210,7 +241,7 @@ export function ListingDetailPage({ listingId, onNavigate }: ListingDetailPagePr
           <div className="bg-white rounded-lg shadow-md p-6 sticky top-20">
             <h2 className="text-xl font-bold mb-4 text-gray-900">Informations vendeur</h2>
 
-            {seller && (
+            {seller ? (
               <div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Nom</p>
@@ -249,6 +280,34 @@ export function ListingDetailPage({ listingId, onNavigate }: ListingDetailPagePr
                     Contacter le vendeur
                   </button>
                 </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-gray-600">Informations du vendeur non disponibles pour cette annonce.</p>
+                {listing.contact_phone && (
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">Téléphone</p>
+                    <a
+                      href={`tel:${listing.contact_phone}`}
+                      className="flex items-center gap-2 text-[#156D3E] hover:underline"
+                    >
+                      <Phone className="h-4 w-4" />
+                      {listing.contact_phone}
+                    </a>
+                  </div>
+                )}
+                {listing.contact_email && (
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">Email</p>
+                    <a
+                      href={`mailto:${listing.contact_email}`}
+                      className="flex items-center gap-2 text-[#156D3E] hover:underline break-all"
+                    >
+                      <Mail className="h-4 w-4 flex-shrink-0" />
+                      {listing.contact_email}
+                    </a>
+                  </div>
+                )}
               </div>
             )}
           </div>
