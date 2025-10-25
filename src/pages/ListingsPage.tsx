@@ -332,12 +332,12 @@ export function ListingsPage({ onNavigate, filters }: ListingsPageProps) {
                         <h3 className="font-semibold text-lg text-gray-900 truncate flex-1">
                           {listing.title}
                         </h3>
-                        {(listing as any).profile?.account_type === 'pro' && (
+                        {listing.profile?.account_type === 'pro' && (
                           <span className="ml-2 px-2 py-0.5 bg-[#156D3E] text-white text-xs font-semibold rounded whitespace-nowrap">
                             PRO
                           </span>
                         )}
-                        {(listing as any).profile?.account_type === 'premium' && (
+                        {listing.profile?.account_type === 'premium' && (
                           <span className="ml-2 px-2 py-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-xs font-semibold rounded whitespace-nowrap">
                             PREMIUM
                           </span>
