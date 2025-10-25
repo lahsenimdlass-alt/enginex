@@ -18,6 +18,21 @@ export function ListingDetailPage({ listingId, onNavigate }: ListingDetailPagePr
     recordView();
   }, [listingId]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!listing || !listing.images || listing.images.length <= 1) return;
+
+      if (e.key === 'ArrowLeft') {
+        setSelectedImage(selectedImage === 0 ? listing.images.length - 1 : selectedImage - 1);
+      } else if (e.key === 'ArrowRight') {
+        setSelectedImage(selectedImage === listing.images.length - 1 ? 0 : selectedImage + 1);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [listing, selectedImage]);
+
   const recordView = async () => {
     await supabase.from('listing_views').insert({
       listing_id: listingId,
@@ -100,26 +115,32 @@ export function ListingDetailPage({ listingId, onNavigate }: ListingDetailPagePr
                   />
                   {listing.images.length > 1 && (
                     <>
+                      <div className="absolute top-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">
+                        {selectedImage + 1} / {listing.images.length}
+                      </div>
                       <button
                         onClick={() => setSelectedImage(selectedImage === 0 ? listing.images!.length - 1 : selectedImage - 1)}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition-all hover:scale-110"
+                        aria-label="Image précédente"
                       >
                         <ChevronLeft className="h-6 w-6" />
                       </button>
                       <button
                         onClick={() => setSelectedImage(selectedImage === listing.images!.length - 1 ? 0 : selectedImage + 1)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition-all hover:scale-110"
+                        aria-label="Image suivante"
                       >
                         <ChevronRight className="h-6 w-6" />
                       </button>
-                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 bg-black/30 px-3 py-2 rounded-full backdrop-blur-sm">
                         {listing.images.map((_, index) => (
                           <button
                             key={index}
                             onClick={() => setSelectedImage(index)}
-                            className={`h-2 rounded-full transition-all ${
-                              selectedImage === index ? 'w-8 bg-white' : 'w-2 bg-white/50'
+                            className={`h-2.5 rounded-full transition-all ${
+                              selectedImage === index ? 'w-8 bg-white shadow-lg' : 'w-2.5 bg-white/60 hover:bg-white/80'
                             }`}
+                            aria-label={`Aller à l'image ${index + 1}`}
                           />
                         ))}
                       </div>
