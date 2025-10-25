@@ -53,7 +53,17 @@ export function HomePage({ onNavigate }: HomePageProps) {
       .order('priority_score', { ascending: false })
       .order('created_at', { ascending: false })
       .limit(6);
-    if (data) setLatestListings(data);
+    if (data) {
+      console.log('🔍 Listings loaded:', data);
+      data.forEach(listing => {
+        console.log(`📋 ${listing.title}:`, {
+          user_id: listing.user_id,
+          profile: listing.profile,
+          account_type: listing.profile?.account_type
+        });
+      });
+      setLatestListings(data);
+    }
   };
 
   const handleSearch = () => {
@@ -263,12 +273,12 @@ export function HomePage({ onNavigate }: HomePageProps) {
                     <h3 className="font-semibold text-lg text-gray-900 truncate flex-1">
                       {listing.title}
                     </h3>
-                    {(listing as any).profile?.account_type === 'pro' && (
+                    {listing.profile?.account_type === 'pro' && (
                       <span className="ml-2 px-2 py-0.5 bg-[#156D3E] text-white text-xs font-semibold rounded whitespace-nowrap">
                         PRO
                       </span>
                     )}
-                    {(listing as any).profile?.account_type === 'premium' && (
+                    {listing.profile?.account_type === 'premium' && (
                       <span className="ml-2 px-2 py-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-xs font-semibold rounded whitespace-nowrap">
                         PREMIUM
                       </span>
