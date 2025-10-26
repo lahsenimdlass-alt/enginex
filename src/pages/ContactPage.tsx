@@ -10,8 +10,31 @@ export function ContactPage() {
   });
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    try {
+      await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-email`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'contact',
+          to: 'enginex.ma@gmail.com',
+          data: {
+            senderName: formData.name,
+            senderEmail: formData.email,
+            subject: formData.subject,
+            message: formData.message
+          }
+        })
+      });
+    } catch (error) {
+      console.error('Failed to send contact email:', error);
+    }
+
     setSubmitted(true);
     setTimeout(() => {
       setSubmitted(false);
