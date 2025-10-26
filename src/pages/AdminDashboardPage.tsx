@@ -56,23 +56,73 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
   };
 
   const approveListing = async (listingId: string) => {
+    const listing = listings.find(l => l.id === listingId);
+
     const { error } = await supabase
       .from('listings')
       .update({ status: 'approved' })
       .eq('id', listingId);
 
     if (!error) {
+      if (listing?.contact_email) {
+        try {
+          await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-email`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              type: 'listing_approval',
+              to: listing.contact_email,
+              data: {
+                userName: 'Utilisateur',
+                listingTitle: listing.title,
+                listingUrl: `${window.location.origin}/listing/${listing.id}`
+              }
+            })
+          });
+        } catch (emailError) {
+          console.error('Failed to send approval email:', emailError);
+        }
+      }
       loadDashboardData();
     }
   };
 
   const rejectListing = async (listingId: string) => {
+    const reason = prompt('Raison du refus (optionnel):');
+    const listing = listings.find(l => l.id === listingId);
+
     const { error } = await supabase
       .from('listings')
       .update({ status: 'rejected' })
       .eq('id', listingId);
 
     if (!error) {
+      if (listing?.contact_email) {
+        try {
+          await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-email`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              type: 'listing_rejection',
+              to: listing.contact_email,
+              data: {
+                userName: 'Utilisateur',
+                listingTitle: listing.title,
+                rejectionReason: reason || 'Votre annonce ne respecte pas nos conditions d\'utilisation.',
+                siteUrl: window.location.origin
+              }
+            })
+          });
+        } catch (emailError) {
+          console.error('Failed to send rejection email:', emailError);
+        }
+      }
       loadDashboardData();
     }
   };
