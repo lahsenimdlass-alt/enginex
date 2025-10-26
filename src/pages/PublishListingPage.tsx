@@ -289,6 +289,28 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
 
       if (insertError) throw insertError;
 
+      try {
+        await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-email`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'new_listing',
+            to: formData.contactEmail || formData.contactPhone + '@temp.enginex.ma',
+            data: {
+              userName: user ? profile?.full_name : 'Utilisateur',
+              listingTitle: formData.title,
+              listingPrice: formData.price,
+              listingRegion: formData.region
+            }
+          })
+        });
+      } catch (emailError) {
+        console.error('Failed to send listing notification email:', emailError);
+      }
+
       setSuccess(true);
       setTimeout(() => {
         if (user) {
