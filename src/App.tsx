@@ -15,6 +15,8 @@ import { AboutPage } from './pages/AboutPage';
 import { TermsPage } from './pages/TermsPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { PhoneLoginPage } from './pages/PhoneLoginPage';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { ListingDetailPage } from './pages/ListingDetailPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 
@@ -34,6 +36,8 @@ type Page =
   | 'terms'
   | 'login'
   | 'register'
+  | 'phone-login'
+  | 'forgot-password'
   | 'listing-detail';
 
 function App() {
@@ -78,6 +82,10 @@ function App() {
         return <LoginPage onNavigate={handleNavigate} />;
       case 'register':
         return <RegisterPage onNavigate={handleNavigate} />;
+      case 'phone-login':
+        return <PhoneLoginPage onNavigate={handleNavigate} />;
+      case 'forgot-password':
+        return <ForgotPasswordPage onNavigate={handleNavigate} />;
       case 'listing-detail':
         return <ListingDetailPage listingId={pageParams?.id} onNavigate={handleNavigate} />;
       default:
