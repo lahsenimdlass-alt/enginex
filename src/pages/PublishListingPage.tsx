@@ -63,15 +63,22 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
   const [imageInput, setImageInput] = useState('');
   const [uploadingImage, setUploadingImage] = useState(false);
 
-  const needsAuth = selectedPlan === 'pro' || selectedPlan === 'premium';
-
   useEffect(() => {
-    if (needsAuth && !user) {
-      setShowAuthForm(true);
+    if (!user) {
+      onNavigate('register');
+      return;
     }
     loadCategories();
     loadEquipmentTypes();
-  }, [needsAuth, user]);
+
+    if (profile) {
+      setFormData(prev => ({
+        ...prev,
+        contactPhone: profile.phone || '',
+        contactEmail: profile.email || '',
+      }));
+    }
+  }, [user, profile]);
 
   const loadCategories = async () => {
     const { data } = await supabase
@@ -174,8 +181,14 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.categoryId || (!formData.equipmentTypeId && !formData.customEquipmentType) || !formData.title || !formData.description || !formData.price || !formData.region || !formData.city || !formData.contactPhone) {
-      setError('Veuillez remplir tous les champs obligatoires (y compris le téléphone)');
+    if (!user) {
+      setError('Vous devez être connecté pour publier une annonce');
+      onNavigate('register');
+      return;
+    }
+
+    if (!formData.categoryId || (!formData.equipmentTypeId && !formData.customEquipmentType) || !formData.title || !formData.description || !formData.price || !formData.region || !formData.city) {
+      setError('Veuillez remplir tous les champs obligatoires');
       return;
     }
 
@@ -183,19 +196,12 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
     setError('');
 
     try {
-      if (selectedPlan === 'individual' || !selectedPlan) {
-        let query = supabase
+      if (profile?.account_type === 'individual') {
+        const { data: existingListings, error: checkError } = await supabase
           .from('listings')
-          .select('id, contact_phone, contact_email')
+          .select('id')
+          .eq('user_id', user.id)
           .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
-
-        if (formData.contactEmail) {
-          query = query.or(`contact_phone.eq.${formData.contactPhone},contact_email.eq.${formData.contactEmail}`);
-        } else {
-          query = query.eq('contact_phone', formData.contactPhone);
-        }
-
-        const { data: existingListings, error: checkError } = await query;
 
         if (checkError) {
           console.error('Check error:', checkError);
@@ -249,7 +255,7 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
       }
 
       const listingData: any = {
-        user_id: null,
+        user_id: user.id,
         category_id: formData.categoryId,
         equipment_type_id: equipmentTypeId,
         title: formData.title,
@@ -264,25 +270,21 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
         images: imageUrls,
         status: 'pending',
         is_active: true,
-        contact_phone: formData.contactPhone,
-        contact_email: formData.contactEmail || null,
+        contact_phone: profile?.phone || formData.contactPhone || null,
+        contact_email: profile?.email || formData.contactEmail || null,
         expires_at: expiresAt.toISOString(),
       };
 
-      if (user) {
-        listingData.user_id = user.id;
+      if (selectedPlan && selectedPlan !== 'individual' && profile?.account_type === 'individual') {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            account_type: selectedPlan,
+            subscription_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          })
+          .eq('id', user.id);
 
-        if (selectedPlan && selectedPlan !== 'individual' && profile?.account_type === 'individual') {
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .update({
-              account_type: selectedPlan,
-              subscription_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-            })
-            .eq('id', user.id);
-
-          if (profileError) throw profileError;
-        }
+        if (profileError) throw profileError;
       }
 
       const { error: insertError } = await supabase.from('listings').insert(listingData);
@@ -313,11 +315,7 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
 
       setSuccess(true);
       setTimeout(() => {
-        if (user) {
-          onNavigate('my-listings');
-        } else {
-          onNavigate('home');
-        }
+        onNavigate('my-listings');
       }, 2000);
     } catch (err: any) {
       setError(err.message || 'Une erreur est survenue');
@@ -356,15 +354,42 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
     );
   }
 
-  if (showAuthForm && needsAuth) {
+  if (!user) {
+    return (
+      <div className="max-w-md mx-auto px-4 py-16">
+        <div className="bg-white rounded-lg shadow-md p-8 text-center">
+          <h1 className="text-3xl font-bold mb-4 text-gray-900">
+            Connexion requise
+          </h1>
+          <p className="text-gray-600 mb-6">
+            Vous devez créer un compte ou vous connecter pour publier une annonce.
+          </p>
+          <button
+            onClick={() => onNavigate('register')}
+            className="w-full bg-[#156D3E] text-white px-6 py-3 rounded-md hover:bg-[#0f5630] transition-colors font-semibold"
+          >
+            Créer un compte
+          </button>
+          <button
+            onClick={() => onNavigate('login')}
+            className="w-full mt-3 text-[#156D3E] hover:underline"
+          >
+            J'ai déjà un compte
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (false) {
     return (
       <div className="max-w-md mx-auto px-4 py-16">
         <div className="bg-white rounded-lg shadow-md p-8">
           <h1 className="text-3xl font-bold mb-2 text-center text-gray-900">
-            {authMode === 'register' ? 'Créer un compte' : 'Se connecter'}
+            Formulaire désactivé
           </h1>
           <p className="text-gray-600 text-center mb-6">
-            Un compte est requis pour l'abonnement {selectedPlan === 'pro' ? 'Pro' : 'Premium'}
+            Ce formulaire a été désactivé
           </p>
 
           {error && (
@@ -691,43 +716,28 @@ export function PublishListingPage({ onNavigate, selectedPlan }: PublishListingP
           </select>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium mb-2 text-gray-700">
-              Téléphone de contact <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="tel"
-              value={formData.contactPhone}
-              onChange={(e) => handleInputChange('contactPhone', e.target.value)}
-              required
-              placeholder="06XXXXXXXX"
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#156D3E]"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Les acheteurs vous contacteront sur ce numéro
-            </p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <h3 className="font-semibold text-gray-900 mb-2">Informations de contact</h3>
+          <p className="text-sm text-gray-700 mb-2">
+            Vos informations de contact depuis votre profil seront utilisées pour cette annonce.
+          </p>
+          <div className="space-y-2 text-sm">
+            {profile?.phone && (
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-gray-700">Téléphone:</span>
+                <span className="text-gray-900">{profile.phone}</span>
+              </div>
+            )}
+            {profile?.email && (
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-gray-700">Email:</span>
+                <span className="text-gray-900">{profile.email}</span>
+              </div>
+            )}
           </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2 text-gray-700">
-              Email de contact {selectedPlan === 'individual' && <span className="text-gray-500">(Facultatif)</span>}
-              {(selectedPlan === 'pro' || selectedPlan === 'premium') && <span className="text-red-500">*</span>}
-            </label>
-            <input
-              type="email"
-              value={formData.contactEmail}
-              onChange={(e) => handleInputChange('contactEmail', e.target.value)}
-              required={selectedPlan === 'pro' || selectedPlan === 'premium'}
-              placeholder="votre@email.com"
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#156D3E]"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              {selectedPlan === 'individual'
-                ? 'Facultatif pour les annonces gratuites'
-                : 'Obligatoire pour les comptes Pro et Premium'}
-            </p>
-          </div>
+          <p className="text-xs text-gray-500 mt-3">
+            Pour modifier ces informations, rendez-vous sur votre profil.
+          </p>
         </div>
 
         <div>
