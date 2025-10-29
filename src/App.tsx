@@ -13,6 +13,12 @@ import { NotificationsPage } from './pages/NotificationsPage';
 import { ContactPage } from './pages/ContactPage';
 import { AboutPage } from './pages/AboutPage';
 import { TermsPage } from './pages/TermsPage';
+import { BlogPage } from './pages/BlogPage';
+import { BlogAgricolePage } from './pages/BlogAgricolePage';
+import { BlogBTPPage } from './pages/BlogBTPPage';
+import { BlogActualitesPage } from './pages/BlogActualitesPage';
+import { BlogArticlePage } from './pages/BlogArticlePage';
+import { AdminCreateListingPage } from './pages/AdminCreateListingPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { PhoneLoginPage } from './pages/PhoneLoginPage';
@@ -34,6 +40,12 @@ type Page =
   | 'contact'
   | 'about'
   | 'terms'
+  | 'blog'
+  | 'blog-agricole'
+  | 'blog-btp'
+  | 'blog-actualites'
+  | 'blog-article'
+  | 'admin-create-listing'
   | 'login'
   | 'register'
   | 'phone-login'
@@ -78,6 +90,18 @@ function App() {
         return <AboutPage onNavigate={handleNavigate} />;
       case 'terms':
         return <TermsPage />;
+      case 'blog':
+        return <BlogPage onNavigate={handleNavigate} />;
+      case 'blog-agricole':
+        return <BlogAgricolePage onNavigate={handleNavigate} />;
+      case 'blog-btp':
+        return <BlogBTPPage onNavigate={handleNavigate} />;
+      case 'blog-actualites':
+        return <BlogActualitesPage onNavigate={handleNavigate} />;
+      case 'blog-article':
+        return <BlogArticlePage onNavigate={handleNavigate} category={pageParams?.category} id={pageParams?.id} />;
+      case 'admin-create-listing':
+        return <AdminCreateListingPage onNavigate={handleNavigate} />;
       case 'login':
         return <LoginPage onNavigate={handleNavigate} />;
       case 'register':
