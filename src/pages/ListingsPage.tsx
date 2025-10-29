@@ -316,7 +316,7 @@ export function ListingsPage({ onNavigate, filters }: ListingsPageProps) {
                     onClick={() => onNavigate('listing-detail', { id: listing.id })}
                     className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
                   >
-                    <div className="h-48 bg-gray-200 flex items-center justify-center">
+                    <div className="relative h-48 bg-gray-200 flex items-center justify-center">
                       {listing.images && listing.images.length > 0 ? (
                         <img
                           src={listing.images[0]}
@@ -325,6 +325,22 @@ export function ListingsPage({ onNavigate, filters }: ListingsPageProps) {
                         />
                       ) : (
                         <Tractor className="h-16 w-16 text-gray-400" />
+                      )}
+                      {/* Badges admin */}
+                      {listing.badge === 'urgent' && (
+                        <span className="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white text-xs font-bold rounded shadow-lg">
+                          URGENT
+                        </span>
+                      )}
+                      {listing.badge === 'top' && (
+                        <span className="absolute top-2 right-2 px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded shadow-lg">
+                          TOP
+                        </span>
+                      )}
+                      {listing.badge === 'exclusive' && (
+                        <span className="absolute top-2 right-2 px-2 py-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-bold rounded shadow-lg">
+                          EXCLUSIF
+                        </span>
                       )}
                     </div>
                     <div className="p-4">
