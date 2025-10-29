@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertCircle, Mail, Phone, Check } from 'lucide-react';
+import { AlertCircle, Mail } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 
@@ -7,16 +7,12 @@ type RegisterPageProps = {
   onNavigate: (page: string) => void;
 };
 
-type RegisterMethod = 'email' | 'phone';
-
 export function RegisterPage({ onNavigate }: RegisterPageProps) {
   const { signUp } = useAuth();
-  const [method, setMethod] = useState<RegisterMethod>('email');
   const [step, setStep] = useState<'info' | 'verify'>('info');
   const [formData, setFormData] = useState({
     fullName: '',
-    email: '',
-    phone: '',
+    emailOrPhone: '',
     password: '',
     confirmPassword: '',
   });
@@ -55,7 +51,11 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
     }
   };
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
+  const isEmail = (input: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
@@ -65,6 +65,13 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
 
     if (formData.password.length < 6) {
       setError('Le mot de passe doit contenir au moins 6 caractères');
+      return;
+    }
+
+    const isEmailInput = isEmail(formData.emailOrPhone);
+
+    if (!isEmailInput) {
+      setError('Veuillez entrer une adresse email valide. L\'inscription par téléphone n\'est pas encore disponible.');
       return;
     }
 
@@ -78,7 +85,7 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
       const { error: dbError } = await supabase
         .from('email_verification_codes')
         .insert({
-          email: formData.email,
+          email: formData.emailOrPhone,
           code,
           expires_at: expiresAt,
           verified: false,
@@ -86,7 +93,7 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
 
       if (dbError) throw dbError;
 
-      await sendVerificationEmail(formData.email, code);
+      await sendVerificationEmail(formData.emailOrPhone, code);
 
       setStep('verify');
     } catch (err: any) {
@@ -111,7 +118,7 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
       const { data: codes, error: fetchError } = await supabase
         .from('email_verification_codes')
         .select('*')
-        .eq('email', formData.email)
+        .eq('email', formData.emailOrPhone)
         .eq('code', verificationCode)
         .eq('verified', false)
         .gt('expires_at', new Date().toISOString())
@@ -133,26 +140,31 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
 
       if (updateError) throw updateError;
 
-      await signUp(formData.email, formData.password, formData.fullName, formData.phone);
+      const phone = isEmail(formData.emailOrPhone) ? '' : formData.emailOrPhone;
+      const email = isEmail(formData.emailOrPhone) ? formData.emailOrPhone : '';
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-email`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            type: 'registration',
-            to: formData.email,
-            data: {
-              name: formData.fullName,
-              siteUrl: window.location.origin,
+      await signUp(email, formData.password, formData.fullName, phone);
+
+      if (isEmail(formData.emailOrPhone)) {
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-email`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
             },
-          }),
-        }
-      );
+            body: JSON.stringify({
+              type: 'registration',
+              to: formData.emailOrPhone,
+              data: {
+                name: formData.fullName,
+                siteUrl: window.location.origin,
+              },
+            }),
+          }
+        );
+      }
 
       onNavigate('home');
     } catch (err: any) {
@@ -162,12 +174,7 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
     }
   };
 
-  const handlePhoneSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    onNavigate('phone-login');
-  };
-
-  if (step === 'verify' && method === 'email') {
+  if (step === 'verify') {
     return (
       <div className="max-w-md mx-auto px-4 py-16">
         <div className="bg-white rounded-lg shadow-md p-8">
@@ -178,7 +185,7 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
             <h1 className="text-3xl font-bold mb-2 text-gray-900">Vérifiez votre email</h1>
             <p className="text-gray-600">
               Nous avons envoyé un code à 6 chiffres à<br />
-              <strong>{formData.email}</strong>
+              <strong>{formData.emailOrPhone}</strong>
             </p>
           </div>
 
@@ -237,37 +244,8 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
       <div className="bg-white rounded-lg shadow-md p-8">
         <h1 className="text-3xl font-bold mb-2 text-center text-gray-900">Inscription</h1>
         <p className="text-gray-600 text-center mb-8">
-          Créez votre compte Enginex gratuitement
+          Créez votre compte pour publier vos annonces
         </p>
-
-        <div className="flex gap-2 mb-6 bg-gray-100 p-1 rounded-lg">
-          <button
-            type="button"
-            onClick={() => setMethod('email')}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md font-medium transition-all ${
-              method === 'email'
-                ? 'bg-white text-[#156D3E] shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <Mail className="h-5 w-5" />
-            Email
-            {method === 'email' && <Check className="h-4 w-4" />}
-          </button>
-          <button
-            type="button"
-            onClick={() => setMethod('phone')}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md font-medium transition-all ${
-              method === 'phone'
-                ? 'bg-white text-[#156D3E] shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <Phone className="h-5 w-5" />
-            Téléphone
-            {method === 'phone' && <Check className="h-4 w-4" />}
-          </button>
-        </div>
 
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
@@ -276,8 +254,7 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
           </div>
         )}
 
-        {method === 'email' ? (
-          <form onSubmit={handleEmailSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium mb-2 text-gray-700">
                 Nom complet <span className="text-red-500">*</span>
@@ -294,29 +271,19 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
 
             <div>
               <label className="block text-sm font-medium mb-2 text-gray-700">
-                Email <span className="text-red-500">*</span>
+                Email ou téléphone <span className="text-red-500">*</span>
               </label>
               <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleChange('email', e.target.value)}
+                type="text"
+                value={formData.emailOrPhone}
+                onChange={(e) => handleChange('emailOrPhone', e.target.value)}
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#156D3E]"
-                placeholder="votre@email.com"
+                placeholder="votre@email.com ou +212 6XX XXX XXX"
               />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
-                Téléphone
-              </label>
-              <input
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => handleChange('phone', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#156D3E]"
-                placeholder="+212 6XX XXX XXX"
-              />
+              <p className="text-xs text-gray-500 mt-1">
+                Utilisez votre email pour recevoir le code de vérification
+              </p>
             </div>
 
             <div>
@@ -357,22 +324,6 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
               {loading ? 'Envoi du code...' : 'Continuer'}
             </button>
           </form>
-        ) : (
-          <form onSubmit={handlePhoneSubmit} className="space-y-6">
-            <div className="text-center py-8">
-              <Phone className="h-16 w-16 text-[#156D3E] mx-auto mb-4" />
-              <p className="text-gray-600 mb-4">
-                Inscription rapide par téléphone avec code SMS
-              </p>
-              <button
-                type="submit"
-                className="w-full bg-[#156D3E] text-white px-6 py-3 rounded-md hover:bg-[#0f5630] transition-colors font-semibold"
-              >
-                Continuer avec le téléphone
-              </button>
-            </div>
-          </form>
-        )}
 
         <div className="mt-6 text-center">
           <p className="text-gray-600">
