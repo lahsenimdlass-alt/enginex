@@ -106,6 +106,28 @@ export function ListingDetailPage({ listingId, onNavigate }: ListingDetailPagePr
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
             <div className="relative h-96 bg-gray-200 flex items-center justify-center group">
+              {/* Badges admin */}
+              {listing.badge === 'urgent' && (
+                <div className="absolute top-4 left-4 z-10">
+                  <span className="px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-full shadow-lg">
+                    URGENT
+                  </span>
+                </div>
+              )}
+              {listing.badge === 'top' && (
+                <div className="absolute top-4 left-4 z-10">
+                  <span className="px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full shadow-lg">
+                    TOP
+                  </span>
+                </div>
+              )}
+              {listing.badge === 'exclusive' && (
+                <div className="absolute top-4 left-4 z-10">
+                  <span className="px-3 py-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-bold rounded-full shadow-lg">
+                    EXCLUSIF
+                  </span>
+                </div>
+              )}
               {listing.images && listing.images.length > 0 ? (
                 <>
                   <img
@@ -260,51 +282,51 @@ export function ListingDetailPage({ listingId, onNavigate }: ListingDetailPagePr
 
         <div className="lg:col-span-1">
           <div className="bg-white rounded-lg shadow-md p-6 sticky top-20">
-            <h2 className="text-xl font-bold mb-4 text-gray-900">Informations vendeur</h2>
+            <h2 className="text-xl font-bold mb-4 text-gray-900">Contact</h2>
 
-            {seller ? (
+            {seller || listing.contact_phone || listing.contact_email ? (
               <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">Nom</p>
-                  <p className="font-semibold text-gray-900">{seller.full_name}</p>
-                </div>
+                {seller && (
+                  <>
+                    <div>
+                      <p className="text-sm text-gray-500 mb-1">Nom</p>
+                      <p className="font-semibold text-gray-900">{seller.full_name}</p>
+                    </div>
 
-                {seller.phone && (
-                  <div>
-                    <p className="text-sm text-gray-500 mb-1">Téléphone</p>
-                    <a
-                      href={`tel:${seller.phone}`}
-                      className="flex items-center gap-2 text-[#156D3E] hover:underline"
-                    >
-                      <Phone className="h-4 w-4" />
-                      {seller.phone}
-                    </a>
-                  </div>
+                    {seller.phone && (
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Téléphone</p>
+                        <a
+                          href={`tel:${seller.phone}`}
+                          className="flex items-center gap-2 text-[#156D3E] hover:underline"
+                        >
+                          <Phone className="h-4 w-4" />
+                          {seller.phone}
+                        </a>
+                      </div>
+                    )}
+
+                    <div>
+                      <p className="text-sm text-gray-500 mb-1">Email</p>
+                      <a
+                        href={`mailto:${seller.email}`}
+                        className="flex items-center gap-2 text-[#156D3E] hover:underline break-all"
+                      >
+                        <Mail className="h-4 w-4 flex-shrink-0" />
+                        {seller.email}
+                      </a>
+                    </div>
+
+                    <div className="pt-4 border-t">
+                      <button
+                        onClick={() => alert(`Contactez ${seller.full_name} via téléphone ou email`)}
+                        className="w-full bg-[#156D3E] text-white px-6 py-3 rounded-md hover:bg-[#0f5630] transition-colors font-semibold"
+                      >
+                        Contacter le vendeur
+                      </button>
+                    </div>
+                  </>
                 )}
-
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">Email</p>
-                  <a
-                    href={`mailto:${seller.email}`}
-                    className="flex items-center gap-2 text-[#156D3E] hover:underline break-all"
-                  >
-                    <Mail className="h-4 w-4 flex-shrink-0" />
-                    {seller.email}
-                  </a>
-                </div>
-
-                <div className="pt-4 border-t">
-                  <button
-                    onClick={() => alert(`Contactez ${seller.full_name} via téléphone ou email`)}
-                    className="w-full bg-[#156D3E] text-white px-6 py-3 rounded-md hover:bg-[#0f5630] transition-colors font-semibold"
-                  >
-                    Contacter le vendeur
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <p className="text-gray-600">Informations du vendeur non disponibles pour cette annonce.</p>
                 {listing.contact_phone && (
                   <div>
                     <p className="text-sm text-gray-500 mb-1">Téléphone</p>
@@ -329,8 +351,22 @@ export function ListingDetailPage({ listingId, onNavigate }: ListingDetailPagePr
                     </a>
                   </div>
                 )}
+                {!seller && (listing.contact_phone || listing.contact_email) && (
+                  <div className="pt-4 border-t">
+                    <button
+                      onClick={() => {
+                        if (listing.contact_phone) {
+                          window.location.href = `tel:${listing.contact_phone}`;
+                        }
+                      }}
+                      className="w-full bg-[#156D3E] text-white px-6 py-3 rounded-md hover:bg-[#0f5630] transition-colors font-semibold"
+                    >
+                      Contacter le vendeur
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
+            ) : null}
           </div>
 
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-6">
