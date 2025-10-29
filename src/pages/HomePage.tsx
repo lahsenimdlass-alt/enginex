@@ -290,6 +290,22 @@ export function HomePage({ onNavigate }: HomePageProps) {
                   ) : (
                     <Tractor className="h-16 w-16 text-gray-400" />
                   )}
+                  {/* Badges admin */}
+                  {listing.badge === 'urgent' && (
+                    <span className="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white text-xs font-bold rounded shadow-lg">
+                      URGENT
+                    </span>
+                  )}
+                  {listing.badge === 'top' && (
+                    <span className="absolute top-2 right-2 px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded shadow-lg">
+                      TOP
+                    </span>
+                  )}
+                  {listing.badge === 'exclusive' && (
+                    <span className="absolute top-2 right-2 px-2 py-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-bold rounded shadow-lg">
+                      EXCLUSIF
+                    </span>
+                  )}
                 </div>
                 <div className="p-4">
                   <div className="flex items-start justify-between mb-2">
