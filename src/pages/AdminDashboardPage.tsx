@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, Trash2, Eye, Users, FileText, TrendingUp, Clock } from 'lucide-react';
+import { CheckCircle, XCircle, Trash2, Eye, Users, FileText, TrendingUp, Clock, Plus } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase, Listing, Profile } from '../lib/supabase';
 
@@ -207,36 +207,45 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
 
       <div className="bg-white rounded-lg shadow-md">
         <div className="border-b border-gray-200">
-          <div className="flex gap-4 px-6 py-4">
+          <div className="flex items-center justify-between px-6 py-4">
+            <div className="flex gap-4">
+              <button
+                onClick={() => setActiveTab('pending')}
+                className={`px-4 py-2 font-medium rounded-md transition-colors ${
+                  activeTab === 'pending'
+                    ? 'bg-orange-100 text-orange-700'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                En attente ({stats.pendingListings})
+              </button>
+              <button
+                onClick={() => setActiveTab('all')}
+                className={`px-4 py-2 font-medium rounded-md transition-colors ${
+                  activeTab === 'all'
+                    ? 'bg-[#156D3E] text-white'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                Toutes les annonces
+              </button>
+              <button
+                onClick={() => setActiveTab('users')}
+                className={`px-4 py-2 font-medium rounded-md transition-colors ${
+                  activeTab === 'users'
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                Utilisateurs ({stats.totalUsers})
+              </button>
+            </div>
             <button
-              onClick={() => setActiveTab('pending')}
-              className={`px-4 py-2 font-medium rounded-md transition-colors ${
-                activeTab === 'pending'
-                  ? 'bg-orange-100 text-orange-700'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
+              onClick={() => onNavigate('admin-create-listing')}
+              className="flex items-center space-x-2 px-4 py-2 bg-[#156D3E] text-white rounded-md hover:bg-[#0f5630] transition-colors font-medium"
             >
-              En attente ({stats.pendingListings})
-            </button>
-            <button
-              onClick={() => setActiveTab('all')}
-              className={`px-4 py-2 font-medium rounded-md transition-colors ${
-                activeTab === 'all'
-                  ? 'bg-[#156D3E] text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              Toutes les annonces
-            </button>
-            <button
-              onClick={() => setActiveTab('users')}
-              className={`px-4 py-2 font-medium rounded-md transition-colors ${
-                activeTab === 'users'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              Utilisateurs ({stats.totalUsers})
+              <Plus className="h-5 w-5" />
+              <span>Créer une annonce</span>
             </button>
           </div>
         </div>
