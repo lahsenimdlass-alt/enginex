@@ -27,6 +27,7 @@ export function Layout({ children, currentPage = 'home', onNavigate }: LayoutPro
     { id: 'home', label: 'Accueil' },
     { id: 'listings', label: 'Annonces' },
     { id: 'subscription-selection', label: 'Publier une annonce', highlight: true },
+    { id: 'blog', label: 'Blog' },
     { id: 'about', label: 'À propos' },
     ...(user ? [
       { id: 'dashboard', label: 'Tableau de bord' },
@@ -35,7 +36,6 @@ export function Layout({ children, currentPage = 'home', onNavigate }: LayoutPro
     ...(user && profile?.is_admin ? [
       { id: 'admin', label: '⚙️ Admin', adminOnly: true }
     ] : []),
-    { id: 'terms', label: 'Conditions d\'utilisation' },
     { id: 'contact', label: 'Contact' },
   ];
 
@@ -227,6 +227,11 @@ export function Layout({ children, currentPage = 'home', onNavigate }: LayoutPro
                 <li>
                   <button onClick={() => onNavigate('contact')} className="text-gray-400 hover:text-white transition-colors">
                     Contact
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => onNavigate('blog')} className="text-gray-400 hover:text-white transition-colors">
+                    Blog
                   </button>
                 </li>
                 <li>
