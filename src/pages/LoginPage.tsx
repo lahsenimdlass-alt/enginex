@@ -59,9 +59,18 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2 text-gray-700">
-              Mot de passe
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Mot de passe
+              </label>
+              <button
+                type="button"
+                onClick={() => onNavigate('forgot-password')}
+                className="text-sm text-[#156D3E] hover:underline font-medium"
+              >
+                Mot de passe oublié ?
+              </button>
+            </div>
             <input
               type="password"
               value={password}
@@ -81,7 +90,23 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
           </button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-6 text-center space-y-3">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">ou</span>
+            </div>
+          </div>
+
+          <button
+            onClick={() => onNavigate('phone-login')}
+            className="w-full bg-white border-2 border-[#156D3E] text-[#156D3E] px-6 py-3 rounded-md hover:bg-[#156D3E] hover:text-white transition-colors font-semibold"
+          >
+            Se connecter par SMS (gratuit)
+          </button>
+
           <p className="text-gray-600">
             Pas encore de compte ?{' '}
             <button
